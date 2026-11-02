@@ -479,9 +479,6 @@ class TokenizerWrapper:
 class NewlineTokenizer(PreTrainedTokenizerFast):
     """A tokenizer that replaces newlines with <n> and <n> with new line."""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def _preprocess_text(self, text):
         return text.replace("\n", "<n>")
 
@@ -502,7 +499,7 @@ class NewlineTokenizer(PreTrainedTokenizerFast):
         return [self._postprocess_text(d) for d in decoded]
 
 
-AutoTokenizer.register("NewlineTokenizer", fast_tokenizer_class=NewlineTokenizer)
+AutoTokenizer.register(NewlineTokenizer, fast_tokenizer_class=NewlineTokenizer)
 
 
 def _match(a, b):

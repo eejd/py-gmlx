@@ -49,6 +49,19 @@ def _bytelevel_meta() -> dict:
 
 SAMPLES = ["Hello, world!", "def f(x): return x*2", "two  spaces"]
 
+def test_newline_tokenizer_saved_and_reloaded(tmp_path):
+    from tokenizers import Tokenizer, models, pre_tokenizers
+    from transformers import AutoTokenizer
+    from gmlx._vendor.mlx_lm.tokenizer_utils import NewlineTokenizer
+
+    backend = Tokenizer(models.WordLevel({"<unk>": 0, "hello": 1, "<n>": 2}, unk_token="<unk>"))
+    backend.pre_tokenizer = pre_tokenizers.WhitespaceSplit()
+    original = NewlineTokenizer(tokenizer_object=backend, unk_token="<unk>")
+    original.save_pretrained(tmp_path)
+    restored = AutoTokenizer.from_pretrained(tmp_path, local_files_only=True)
+    assert isinstance(restored, NewlineTokenizer)
+    assert restored.decode(restored.encode("hello \n")) == "hello \n"
+
 
 def test_bytelevel_roundtrip_and_specials():
     tok = load_tokenizer_from_gguf(_bytelevel_meta(), "qwen2")
